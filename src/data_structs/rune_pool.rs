@@ -45,41 +45,6 @@ struct RunePoolMeta {
     pub endCount: u128, // Converted to u128
 }
 
-pub async fn create_tables(pool: &PgPool) -> Result<(), sqlx::Error> {
-    sqlx::query(
-        r#"
-    CREATE TABLE IF NOT EXISTS RunePoolMeta (
-        id SERIAL PRIMARY KEY,
-        startTime BIGINT,
-        endTime BIGINT,
-        startUnits BIGINT,
-        startCount BIGINT,
-        endUnits BIGINT,
-        endCount BIGINT
-    );"#,
-    )
-    .execute(pool)
-    .await?;
-
-    sqlx::query(
-        r#"
-    CREATE TABLE IF NOT EXISTS RunePoolIntervals (
-        id SERIAL PRIMARY KEY,
-        startTime BIGINT,
-        endTime BIGINT,
-        count BIGINT,
-        units BIGINT
-    );
-    "#,
-    )
-    .execute(pool)
-    .await?;
-
-    std::println!("Tables created successfully!");
-
-    Ok(())
-}
-
 pub async fn insert_data(pool: &PgPool, data: RunePoolIntervalsInt) -> Result<(), sqlx::Error> {
     // Convert meta data with overflow check
     let meta_start_time: i64 = data.meta.startTime.try_into().map_err(|_| {
@@ -108,7 +73,7 @@ pub async fn insert_data(pool: &PgPool, data: RunePoolIntervalsInt) -> Result<()
     // Insert into RunePoolMeta
     sqlx::query(
         r#"
-        INSERT INTO RunePoolMeta (startTime, endTime, startUnits, startCount, endUnits, endCount)
+        INSERT INTO Rune_Pool_Data_Meta (startTime, endTime, startUnits, startCount, endUnits, endCount)
         VALUES ($1, $2, $3, $4, $5, $6)
         "#,
     )
@@ -150,7 +115,7 @@ pub async fn insert_data(pool: &PgPool, data: RunePoolIntervalsInt) -> Result<()
 
         sqlx::query(
             r#"
-            INSERT INTO RunePoolIntervals (startTime, endTime, count, units)
+            INSERT INTO Rune_Pool_Data_Intervals (startTime, endTime, count, units)
             VALUES ($1, $2, $3, $4)
             "#,
         )
