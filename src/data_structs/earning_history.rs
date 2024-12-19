@@ -22,18 +22,18 @@ where
 #[derive(Deserialize, Debug)]
 pub struct PoolData {
     pub pool: String,
-    #[serde(deserialize_with = "string_to_u128")]
-    pub assetLiquidityFees: u128,
-    #[serde(deserialize_with = "string_to_u128")]
-    pub runeLiquidityFees: u128,
-    #[serde(deserialize_with = "string_to_u128")]
-    pub totalLiquidityFeesRune: u128,
-    #[serde(deserialize_with = "string_to_u128")]
-    pub saverEarning: u128,
-    #[serde(deserialize_with = "string_to_u128")]
-    pub rewards: u128,
-    #[serde(deserialize_with = "string_to_u128")]
-    pub earnings: u128,
+    #[serde(deserialize_with = "string_to_f64")]
+    pub assetLiquidityFees: f64,
+    #[serde(deserialize_with = "string_to_f64")]
+    pub runeLiquidityFees: f64,
+    #[serde(deserialize_with = "string_to_f64")]
+    pub totalLiquidityFeesRune: f64,
+    #[serde(deserialize_with = "string_to_f64")]
+    pub saverEarning: f64,
+    #[serde(deserialize_with = "string_to_f64")]
+    pub rewards: f64,
+    #[serde(deserialize_with = "string_to_f64")]
+    pub earnings: f64,
 }
 
 // Struct for Meta data
