@@ -1,7 +1,9 @@
+use axum::{routing::get, Router};
 use dotenv::dotenv;
-use serde_json;
 use sqlx::PgPool;
 use std::env;
+use std::net::SocketAddr;
+use tokio::net::TcpListener;
 
 mod data_structs;
 use data_structs::depth_data::RootDepthDetails;
@@ -10,6 +12,7 @@ use data_structs::rune_pool::RunePoolIntervalsInt;
 use data_structs::swap_history::RootSwapDetails;
 
 mod insert_data_post_migration;
+mod query_data_from_db;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,11 +21,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pool = PgPool::connect(&database_url).await?;
 
     // creates the sql tables in the db
-    let _ = migration_script().await?;
+    // let _ = migration_script().await?;
 
-    // let mut count = 0u8;
-
-    // while count < 5 {
     #[allow(unused_doc_comments)]
     /////////////////////////////////////////////////////
     /// Rune POOL DATA INSERTION  SCRIPT ///////////////
@@ -35,10 +35,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     insert_data_post_migration::rune_pool_data_insert_script::insert_data(&pool, runepool_parsed)
         .await?;
 
-    #[allow(unused_doc_comments)]
-    /////////////////////////////////////////////////////
-    /// DEPTH DATA INSERTION SCRIPT /////////////////////
-    ////////////////////////////////////////////////////
+    // #[allow(unused_doc_comments)]
+    // /////////////////////////////////////////////////////
+    // /// DEPTH DATA INSERTION SCRIPT /////////////////////
+    // ////////////////////////////////////////////////////
     let depth_data = depth_data().await?.text().await?;
     std::println!("The depth data {:#?}", depth_data);
     let depth_parsed = serde_json::from_str::<RootDepthDetails>(&depth_data)?;
@@ -50,20 +50,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /////////////////////////////////////////////////////
     /// EARNING DATA INSERTION SCRIPT ///////////////////
     ////////////////////////////////////////////////////
-    // let earning_data = earning_history().await?.text().await?;
+    let earning_data = earning_history().await?.text().await?;
 
-    // std::println!("Hello2");
-    // let earning_data_parsed = serde_json::from_str::<RootEarnDetails>(&earning_data)?;
-    // std::println!("Hello3");
-    // let y = earning_data_parsed;
+    std::println!("Hello2");
+    let earning_data_parsed = serde_json::from_str::<RootEarnDetails>(&earning_data)?;
+    std::println!("Hello3");
+    let y = earning_data_parsed;
 
-    // let _ = insert_data_post_migration::earning_data_insert_script::insert_rune_pool_meta(
-    //     &y.meta,&pool
-    // )
-    // .await?;
-    // let _ = insert_data_post_migration::earning_data_insert_script::insert_rune_pool_intervals(&y.intervals, &pool)
-    // .await?;
-
+    let _ = insert_data_post_migration::earning_data_insert_script::insert_rune_pool_meta(
+        &y.meta, &pool,
+    )
+    .await?;
+    let _ = insert_data_post_migration::earning_data_insert_script::insert_rune_pool_intervals(
+        &y.intervals,
+        &pool,
+    )
+    .await?;
 
     #[allow(unused_doc_comments)]
     /////////////////////////////////////////////////////
@@ -81,24 +83,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .await?;
 
-    // count += 1;
-    // }
+    // std::println!("The insertion of data has been cpompleted successfully!");
+    let pool_for_api = pool.clone(); // Clone the pool for the API server
+
+    start_server(pool_for_api).await?;
 
     Ok(())
 }
 
 async fn runepool_fn() -> Result<reqwest::Response, reqwest::Error> {
-    reqwest::get(
-        "https://midgard.ninerealms.com/v2/history/runepool?interval=day&count=10",
-    )
-    .await
+    reqwest::get("https://midgard.ninerealms.com/v2/history/runepool?interval=day&count=10").await
 }
 
 async fn swap_history() -> Result<reqwest::Response, reqwest::Error> {
-    reqwest::get(
-        "https://midgard.ninerealms.com/v2/history/swaps?interval=hour&count=10",
-    )
-    .await
+    reqwest::get("https://midgard.ninerealms.com/v2/history/swaps?interval=hour&count=10").await
 }
 
 async fn earning_history() -> Result<reqwest::Response, reqwest::Error> {
@@ -106,7 +104,10 @@ async fn earning_history() -> Result<reqwest::Response, reqwest::Error> {
 }
 
 async fn depth_data() -> Result<reqwest::Response, reqwest::Error> {
-    reqwest::get("https://midgard.ninerealms.com/v2/history/depths/AVAX.AVAX/?interval=hour&count=10").await
+    reqwest::get(
+        "https://midgard.ninerealms.com/v2/history/depths/AVAX.AVAX/?interval=hour&count=10",
+    )
+    .await
 }
 
 async fn migration_script() -> Result<(), sqlx::Error> {
@@ -118,6 +119,34 @@ async fn migration_script() -> Result<(), sqlx::Error> {
     migrator.run(&pool).await?;
 
     std::println!("Migration script ran successfully!");
+
+    Ok(())
+}
+
+pub async fn start_server(pool: PgPool) -> Result<(), Box<dyn std::error::Error>> {
+    let app = Router::new()
+        .route(
+            "/runepooldata/meta",
+            get(query_data_from_db::rune_pool_data_query::query_meta))
+        .route(
+            "/runepooldata/intervals",
+            get(query_data_from_db::rune_pool_data_query::query_intervals),
+        )
+        .route(
+            "/depthdata/meta",
+            get(query_data_from_db::rune_pool_depth_data::query_meta),
+        )
+        .route(
+            "/depthdata/intervals",
+            get(query_data_from_db::rune_pool_depth_data::query_intervals),
+        )
+        .with_state(pool);
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    println!("API Server running at http://{}", addr);
+
+    let listener = TcpListener::bind(&addr).await?;
+    axum::serve(listener, app.into_make_service()).await?;
 
     Ok(())
 }

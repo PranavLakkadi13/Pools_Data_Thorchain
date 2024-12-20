@@ -3,115 +3,98 @@ use sqlx::PgPool;
 
 pub async fn insert_data(pool: &PgPool, data: RootDepthDetails) -> Result<(), sqlx::Error> {
     let meta_start_time: i64 = data.meta.startTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("StartTime {} too large for i64", data.meta.startTime).into())
+        sqlx::Error::Protocol(format!(
+            "StartTime {} too large for i64",
+            data.meta.startTime
+        ))
     })?;
 
     let meta_end_time: i64 = data.meta.endTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("EndTime {} too large for i64", data.meta.endTime).into())
+        sqlx::Error::Protocol(format!("EndTime {} too large for i64", data.meta.endTime))
     })?;
 
     let meta_price_shift_loss: f64 = data.meta.priceShiftLoss.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "PriceShiftLoss {} too large for f64",
-                data.meta.priceShiftLoss
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "PriceShiftLoss {} too large for f64",
+            data.meta.priceShiftLoss
+        ))
     })?;
 
     let meta_luvi_increase: f64 = data.meta.luviIncrease.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("LuviIncrease {} too large for f64", data.meta.luviIncrease).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "LuviIncrease {} too large for f64",
+            data.meta.luviIncrease
+        ))
     })?;
 
     let meta_start_asset_depth: i64 = data.meta.startAssetDepth.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "StartAssetDepth {} too large for i64",
-                data.meta.startAssetDepth
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartAssetDepth {} too large for i64",
+            data.meta.startAssetDepth
+        ))
     })?;
 
     let meta_start_rune_depth: i64 = data.meta.startRuneDepth.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "StartRuneDepth {} too large for i64",
-                data.meta.startRuneDepth
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartRuneDepth {} too large for i64",
+            data.meta.startRuneDepth
+        ))
     })?;
 
     let meta_start_lp_units: i64 = data.meta.startLPUnits.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("StartLPUnits {} too large for i64", data.meta.startLPUnits).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartLPUnits {} too large for i64",
+            data.meta.startLPUnits
+        ))
     })?;
 
     let meta_start_member_count: i64 = data.meta.startMemberCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "StartMemberCount {} too large for i64",
-                data.meta.startMemberCount
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartMemberCount {} too large for i64",
+            data.meta.startMemberCount
+        ))
     })?;
 
     let meta_start_synth_units: i64 = data.meta.startSynthUnits.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "StartSynthUnits {} too large for i64",
-                data.meta.startSynthUnits
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartSynthUnits {} too large for i64",
+            data.meta.startSynthUnits
+        ))
     })?;
 
     let meta_end_asset_depth: i64 = data.meta.endAssetDepth.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "EndAssetDepth {} too large for i64",
-                data.meta.endAssetDepth
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "EndAssetDepth {} too large for i64",
+            data.meta.endAssetDepth
+        ))
     })?;
 
     let meta_end_rune_depth: i64 = data.meta.endRuneDepth.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("EndRuneDepth {} too large for i64", data.meta.endRuneDepth).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "EndRuneDepth {} too large for i64",
+            data.meta.endRuneDepth
+        ))
     })?;
 
     let meta_end_lp_units: i64 = data.meta.endLPUnits.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("EndLPUnits {} too large for i64", data.meta.endLPUnits).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "EndLPUnits {} too large for i64",
+            data.meta.endLPUnits
+        ))
     })?;
 
     let meta_end_member_count: i64 = data.meta.endMemberCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "EndMemberCount {} too large for i64",
-                data.meta.endMemberCount
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "EndMemberCount {} too large for i64",
+            data.meta.endMemberCount
+        ))
     })?;
 
     let meta_end_synth_units: i64 = data.meta.endSynthUnits.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "EndSynthUnits {} too large for i64",
-                data.meta.endSynthUnits
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "EndSynthUnits {} too large for i64",
+            data.meta.endSynthUnits
+        ))
     })?;
 
     sqlx::query(
@@ -142,111 +125,84 @@ pub async fn insert_data(pool: &PgPool, data: RootDepthDetails) -> Result<(), sq
 
     for interval in &data.intervals {
         let start_time: i64 = interval.startTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval StartTime {} too large for i64",
-                    interval.startTime
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval StartTime {} too large for i64",
+                interval.startTime
+            ))
         })?;
 
         let end_time: i64 = interval.endTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("Interval EndTime {} too large for i64", interval.endTime).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval EndTime {} too large for i64",
+                interval.endTime
+            ))
         })?;
 
         let asset_depth: i64 = interval.assetDepth.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval AssetDepth {} too large for i64",
-                    interval.assetDepth
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval AssetDepth {} too large for i64",
+                interval.assetDepth
+            ))
         })?;
 
         let rune_depth: i64 = interval.runeDepth.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval RuneDepth {} too large for i64",
-                    interval.runeDepth
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval RuneDepth {} too large for i64",
+                interval.runeDepth
+            ))
         })?;
 
         let asset_price: f64 = interval.assetPrice.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval AssetPrice {} too large for f64",
-                    interval.assetPrice
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval AssetPrice {} too large for f64",
+                interval.assetPrice
+            ))
         })?;
 
         let asset_price_usd: f64 = interval.assetPriceUSD.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval AssetPriceUSD {} too large for f64",
-                    interval.assetPriceUSD
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval AssetPriceUSD {} too large for f64",
+                interval.assetPriceUSD
+            ))
         })?;
 
         let liquidity_units: i64 = interval.liquidityUnits.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval LiquidityUnits {} too large for i64",
-                    interval.liquidityUnits
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval LiquidityUnits {} too large for i64",
+                interval.liquidityUnits
+            ))
         })?;
 
         let members_count: i64 = interval.membersCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval MembersCount {} too large for i64",
-                    interval.membersCount
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval MembersCount {} too large for i64",
+                interval.membersCount
+            ))
         })?;
 
         let synth_units: i64 = interval.synthUnits.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval SynthUnits {} too large for i64",
-                    interval.synthUnits
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval SynthUnits {} too large for i64",
+                interval.synthUnits
+            ))
         })?;
 
         let synth_supply: i64 = interval.synthSupply.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval SynthSupply {} too large for i64",
-                    interval.synthSupply
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval SynthSupply {} too large for i64",
+                interval.synthSupply
+            ))
         })?;
 
         let units: i64 = interval.units.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("Interval Units {} too large for i64", interval.units).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval Units {} too large for i64",
+                interval.units
+            ))
         })?;
 
         let luvi: f64 = interval.luvi.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("Interval Luvi {} too large for f64", interval.luvi).into(),
-            )
+            sqlx::Error::Protocol(format!("Interval Luvi {} too large for f64", interval.luvi))
         })?;
 
         sqlx::query(

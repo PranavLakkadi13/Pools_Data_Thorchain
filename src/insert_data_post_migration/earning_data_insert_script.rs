@@ -1,7 +1,6 @@
 use crate::data_structs::earning_history::{PoolData, RunePoolInterval, RunePoolMeta};
 use sqlx;
 
-
 pub async fn insert_pool_data(
     pool_data: &PoolData,
     pool: &sqlx::PgPool,
@@ -11,9 +10,10 @@ pub async fn insert_pool_data(
         if value.is_finite() && value >= i64::MIN as f64 && value <= i64::MAX as f64 {
             Ok(value.round() as i64)
         } else {
-            Err(sqlx::Error::Protocol(
-                format!("{} value {} is out of range for i64", field_name, value).into(),
-            ))
+            Err(sqlx::Error::Protocol(format!(
+                "{} value {} is out of range for i64",
+                field_name, value
+            )))
         }
     }
 
@@ -23,7 +23,8 @@ pub async fn insert_pool_data(
     // Convert each field with the helper function
     let asset_liquidity_fees = f64_to_i64(pool_data.assetLiquidityFees, "assetLiquidityFees")?;
     let rune_liquidity_fees = f64_to_i64(pool_data.runeLiquidityFees, "runeLiquidityFees")?;
-    let total_liquidity_fees_rune = f64_to_i64(pool_data.totalLiquidityFeesRune, "totalLiquidityFeesRune")?;
+    let total_liquidity_fees_rune =
+        f64_to_i64(pool_data.totalLiquidityFeesRune, "totalLiquidityFeesRune")?;
     let saver_earning = f64_to_i64(pool_data.saverEarning, "saverEarning")?;
     let rewards = f64_to_i64(pool_data.rewards, "rewards")?;
     let earnings = f64_to_i64(pool_data.earnings, "earnings")?;
@@ -54,56 +55,55 @@ pub async fn insert_pool_data(
     Ok(())
 }
 
-
 pub async fn insert_rune_pool_meta(
     meta: &RunePoolMeta,
     pool: &sqlx::PgPool,
 ) -> Result<(), sqlx::Error> {
     // Convert meta.startTime to i64 with error handling
     let meta_start_time: i64 = meta.startTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("startTime {} too large for i64", meta.startTime).into())
+        sqlx::Error::Protocol(format!("startTime {} too large for i64", meta.startTime))
     })?;
 
     // Convert meta.endTime to i64 with error handling
     let meta_end_time: i64 = meta.endTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("endTime {} too large for i64", meta.endTime).into())
+        sqlx::Error::Protocol(format!("endTime {} too large for i64", meta.endTime))
     })?;
 
     // Convert meta.liquidityFees to i64 with error handling
     let meta_liquidity_fees: i64 = meta.liquidityFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("liquidityFees {} too large for i64", meta.liquidityFees).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "liquidityFees {} too large for i64",
+            meta.liquidityFees
+        ))
     })?;
 
     // Convert meta.blockRewards to i64 with error handling
     let meta_block_rewards: i64 = meta.blockRewards.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("blockRewards {} too large for i64", meta.blockRewards).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "blockRewards {} too large for i64",
+            meta.blockRewards
+        ))
     })?;
 
     // Convert meta.earnings to i64 with error handling
     let meta_earnings: i64 = meta.earnings.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("earnings {} too large for i64", meta.earnings).into())
+        sqlx::Error::Protocol(format!("earnings {} too large for i64", meta.earnings))
     })?;
 
     // Convert meta.bondingEarnings to i64 with error handling
     let meta_bonding_earnings: i64 = meta.bondingEarnings.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("bondingEarnings {} too large for i64", meta.bondingEarnings).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "bondingEarnings {} too large for i64",
+            meta.bondingEarnings
+        ))
     })?;
 
     // Convert meta.liquidityEarnings to i64 with error handling
     let meta_liquidity_earnings: i64 = meta.liquidityEarnings.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "liquidityEarnings {} too large for i64",
-                meta.liquidityEarnings
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "liquidityEarnings {} too large for i64",
+            meta.liquidityEarnings
+        ))
     })?;
 
     // Use f64 directly for avgNodeCount and runePriceUSD as they do not need conversion
@@ -145,65 +145,60 @@ pub async fn insert_rune_pool_intervals(
     for interval in intervals {
         // Convert interval.startTime to i64 with error handling
         let interval_start_time: i64 = interval.startTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("startTime {} too large for i64", interval.startTime).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "startTime {} too large for i64",
+                interval.startTime
+            ))
         })?;
 
         // Convert interval.endTime to i64 with error handling
         let interval_end_time: i64 = interval.endTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!("endTime {} too large for i64", interval.endTime).into())
+            sqlx::Error::Protocol(format!("endTime {} too large for i64", interval.endTime))
         })?;
 
         // Convert interval.liquidityFees to i64 with error handling
         let interval_liquidity_fees: i64 = interval.liquidityFees.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("liquidityFees {} too large for i64", interval.liquidityFees).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "liquidityFees {} too large for i64",
+                interval.liquidityFees
+            ))
         })?;
 
         // Convert interval.blockRewards to i64 with error handling
         let interval_block_rewards: i64 = interval.blockRewards.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("blockRewards {} too large for i64", interval.blockRewards).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "blockRewards {} too large for i64",
+                interval.blockRewards
+            ))
         })?;
 
         // Convert interval.earnings to i64 with error handling
         let interval_earnings: i64 = interval.earnings.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("earnings {} too large for i64", interval.earnings).into(),
-            )
+            sqlx::Error::Protocol(format!("earnings {} too large for i64", interval.earnings))
         })?;
 
         // Convert interval.bondingEarnings to i64 with error handling
         let interval_bonding_earnings: i64 = interval.bondingEarnings.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "bondingEarnings {} too large for i64",
-                    interval.bondingEarnings
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "bondingEarnings {} too large for i64",
+                interval.bondingEarnings
+            ))
         })?;
 
         // Convert interval.liquidityEarnings to i64 with error handling
         let interval_liquidity_earnings: i64 =
             interval.liquidityEarnings.try_into().map_err(|_| {
-                sqlx::Error::Protocol(
-                    format!(
-                        "liquidityEarnings {} too large for i64",
-                        interval.liquidityEarnings
-                    )
-                    .into(),
-                )
+                sqlx::Error::Protocol(format!(
+                    "liquidityEarnings {} too large for i64",
+                    interval.liquidityEarnings
+                ))
             })?;
 
         // Use f64 directly for avgNodeCount and runePriceUSD as they do not need conversion
         let avg_node_count = interval.avgNodeCount;
         let rune_price_usd = interval.runePriceUSD;
 
-        if interval.pools.len() > 0 {
+        if !interval.pools.is_empty() {
             for pool_data in &interval.pools {
                 // Insert pool data
                 insert_pool_data(pool_data, pool).await?;

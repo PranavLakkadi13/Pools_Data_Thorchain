@@ -4,26 +4,31 @@ use sqlx::PgPool;
 pub async fn insert_data(pool: &PgPool, data: RunePoolIntervalsInt) -> Result<(), sqlx::Error> {
     // Convert meta data with overflow check
     let meta_start_time: i64 = data.meta.startTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("StartTime {} too large for i64", data.meta.startTime).into())
+        sqlx::Error::Protocol(format!(
+            "StartTime {} too large for i64",
+            data.meta.startTime
+        ))
     })?;
     let meta_end_time: i64 = data.meta.endTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("EndTime {} too large for i64", data.meta.endTime).into())
+        sqlx::Error::Protocol(format!("EndTime {} too large for i64", data.meta.endTime))
     })?;
     let meta_start_units: i64 = data.meta.startUnits.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("StartUnits {} too large for i64", data.meta.startUnits).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartUnits {} too large for i64",
+            data.meta.startUnits
+        ))
     })?;
     let meta_start_count: i64 = data.meta.startCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("StartCount {} too large for i64", data.meta.startCount).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "StartCount {} too large for i64",
+            data.meta.startCount
+        ))
     })?;
     let meta_end_units: i64 = data.meta.endUnits.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("EndUnits {} too large for i64", data.meta.endUnits).into())
+        sqlx::Error::Protocol(format!("EndUnits {} too large for i64", data.meta.endUnits))
     })?;
     let meta_end_count: i64 = data.meta.endCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("EndCount {} too large for i64", data.meta.endCount).into())
+        sqlx::Error::Protocol(format!("EndCount {} too large for i64", data.meta.endCount))
     })?;
 
     // Insert into RunePoolMeta
@@ -45,28 +50,28 @@ pub async fn insert_data(pool: &PgPool, data: RunePoolIntervalsInt) -> Result<()
     // Insert intervals into RunePoolIntervals
     for interval in &data.intervals {
         let start_time: i64 = interval.startTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "Interval StartTime {} too large for i64",
-                    interval.startTime
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval StartTime {} too large for i64",
+                interval.startTime
+            ))
         })?;
         let end_time: i64 = interval.endTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("Interval EndTime {} too large for i64", interval.endTime).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval EndTime {} too large for i64",
+                interval.endTime
+            ))
         })?;
         let count: i64 = interval.count.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("Interval Count {} too large for i64", interval.count).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval Count {} too large for i64",
+                interval.count
+            ))
         })?;
         let units: i64 = interval.units.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("Interval Units {} too large for i64", interval.units).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "Interval Units {} too large for i64",
+                interval.units
+            ))
         })?;
 
         sqlx::query(

@@ -6,164 +6,169 @@ pub async fn insert_rune_pool_meta(
     pool: &sqlx::PgPool,
 ) -> Result<(), sqlx::Error> {
     let start_time: i64 = meta.startTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("startTime {} too large for i64", meta.startTime).into())
+        sqlx::Error::Protocol(format!("startTime {} too large for i64", meta.startTime))
     })?;
     let end_time: i64 = meta.endTime.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("endTime {} too large for i64", meta.endTime).into())
+        sqlx::Error::Protocol(format!("endTime {} too large for i64", meta.endTime))
     })?;
     let to_asset_count: i64 = meta.toAssetCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("toAssetCount {} too large for i64", meta.toAssetCount).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toAssetCount {} too large for i64",
+            meta.toAssetCount
+        ))
     })?;
     let to_rune_count: i64 = meta.toRuneCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("toRuneCount {} too large for i64", meta.toRuneCount).into())
+        sqlx::Error::Protocol(format!(
+            "toRuneCount {} too large for i64",
+            meta.toRuneCount
+        ))
     })?;
     let to_trade_count: i64 = meta.toTradeCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("toTradeCount {} too large for i64", meta.toTradeCount).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toTradeCount {} too large for i64",
+            meta.toTradeCount
+        ))
     })?;
     let from_trade_count: i64 = meta.fromTradeCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("fromTradeCount {} too large for i64", meta.fromTradeCount).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "fromTradeCount {} too large for i64",
+            meta.fromTradeCount
+        ))
     })?;
     let synth_mint_count: i64 = meta.synthMintCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("synthMintCount {} too large for i64", meta.synthMintCount).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthMintCount {} too large for i64",
+            meta.synthMintCount
+        ))
     })?;
     let synth_redeem_count: i64 = meta.synthRedeemCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "synthRedeemCount {} too large for i64",
-                meta.synthRedeemCount
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthRedeemCount {} too large for i64",
+            meta.synthRedeemCount
+        ))
     })?;
     let total_count: i64 = meta.totalCount.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("totalCount {} too large for i64", meta.totalCount).into())
+        sqlx::Error::Protocol(format!("totalCount {} too large for i64", meta.totalCount))
     })?;
     let to_asset_volume: i64 = meta.toAssetVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("toAssetVolume {} too large for i64", meta.toAssetVolume).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toAssetVolume {} too large for i64",
+            meta.toAssetVolume
+        ))
     })?;
     let to_rune_volume: i64 = meta.toRuneVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("toRuneVolume {} too large for i64", meta.toRuneVolume).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toRuneVolume {} too large for i64",
+            meta.toRuneVolume
+        ))
     })?;
     let to_trade_volume: i64 = meta.toTradeVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("toTradeVolume {} too large for i64", meta.toTradeVolume).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toTradeVolume {} too large for i64",
+            meta.toTradeVolume
+        ))
     })?;
     let from_trade_volume: i64 = meta.fromTradeVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("fromTradeVolume {} too large for i64", meta.fromTradeVolume).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "fromTradeVolume {} too large for i64",
+            meta.fromTradeVolume
+        ))
     })?;
     let synth_mint_volume: i64 = meta.synthMintVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("synthMintVolume {} too large for i64", meta.synthMintVolume).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthMintVolume {} too large for i64",
+            meta.synthMintVolume
+        ))
     })?;
     let synth_redeem_volume: i64 = meta.synthRedeemVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "synthRedeemVolume {} too large for i64",
-                meta.synthRedeemVolume
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthRedeemVolume {} too large for i64",
+            meta.synthRedeemVolume
+        ))
     })?;
     let total_volume: i64 = meta.totalVolume.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("totalVolume {} too large for i64", meta.totalVolume).into())
+        sqlx::Error::Protocol(format!(
+            "totalVolume {} too large for i64",
+            meta.totalVolume
+        ))
     })?;
     let to_asset_volume_usd: i64 = meta.toAssetVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "toAssetVolumeUSD {} too large for i64",
-                meta.toAssetVolumeUSD
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toAssetVolumeUSD {} too large for i64",
+            meta.toAssetVolumeUSD
+        ))
     })?;
     let to_rune_volume_usd: i64 = meta.toRuneVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("toRuneVolumeUSD {} too large for i64", meta.toRuneVolumeUSD).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toRuneVolumeUSD {} too large for i64",
+            meta.toRuneVolumeUSD
+        ))
     })?;
     let to_trade_volume_usd: i64 = meta.toTradeVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "toTradeVolumeUSD {} too large for i64",
-                meta.toTradeVolumeUSD
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "toTradeVolumeUSD {} too large for i64",
+            meta.toTradeVolumeUSD
+        ))
     })?;
     let from_trade_volume_usd: i64 = meta.fromTradeVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "fromTradeVolumeUSD {} too large for i64",
-                meta.fromTradeVolumeUSD
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "fromTradeVolumeUSD {} too large for i64",
+            meta.fromTradeVolumeUSD
+        ))
     })?;
     let synth_mint_volume_usd: i64 = meta.synthMintVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "synthMintVolumeUSD {} too large for i64",
-                meta.synthMintVolumeUSD
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthMintVolumeUSD {} too large for i64",
+            meta.synthMintVolumeUSD
+        ))
     })?;
     let synth_redeem_volume_usd: i64 = meta.synthRedeemVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!(
-                "synthRedeemVolumeUSD {} too large for i64",
-                meta.synthRedeemVolumeUSD
-            )
-            .into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthRedeemVolumeUSD {} too large for i64",
+            meta.synthRedeemVolumeUSD
+        ))
     })?;
     let total_volume_usd: i64 = meta.totalVolumeUSD.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("totalVolumeUSD {} too large for i64", meta.totalVolumeUSD).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "totalVolumeUSD {} too large for i64",
+            meta.totalVolumeUSD
+        ))
     })?;
     let to_asset_fees: i64 = meta.toAssetFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("toAssetFees {} too large for i64", meta.toAssetFees).into())
+        sqlx::Error::Protocol(format!(
+            "toAssetFees {} too large for i64",
+            meta.toAssetFees
+        ))
     })?;
     let to_rune_fees: i64 = meta.toRuneFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("toRuneFees {} too large for i64", meta.toRuneFees).into())
+        sqlx::Error::Protocol(format!("toRuneFees {} too large for i64", meta.toRuneFees))
     })?;
     let to_trade_fees: i64 = meta.toTradeFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("toTradeFees {} too large for i64", meta.toTradeFees).into())
+        sqlx::Error::Protocol(format!(
+            "toTradeFees {} too large for i64",
+            meta.toTradeFees
+        ))
     })?;
     let from_trade_fees: i64 = meta.fromTradeFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("fromTradeFees {} too large for i64", meta.fromTradeFees).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "fromTradeFees {} too large for i64",
+            meta.fromTradeFees
+        ))
     })?;
     let synth_mint_fees: i64 = meta.synthMintFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("synthMintFees {} too large for i64", meta.synthMintFees).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthMintFees {} too large for i64",
+            meta.synthMintFees
+        ))
     })?;
     let synth_redeem_fees: i64 = meta.synthRedeemFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(
-            format!("synthRedeemFees {} too large for i64", meta.synthRedeemFees).into(),
-        )
+        sqlx::Error::Protocol(format!(
+            "synthRedeemFees {} too large for i64",
+            meta.synthRedeemFees
+        ))
     })?;
     let total_fees: i64 = meta.totalFees.try_into().map_err(|_| {
-        sqlx::Error::Protocol(format!("totalFees {} too large for i64", meta.totalFees).into())
+        sqlx::Error::Protocol(format!("totalFees {} too large for i64", meta.totalFees))
     })?;
     let to_asset_average_slip: f64 = meta.toAssetAverageSlip;
     let to_rune_average_slip: f64 = meta.toRuneAverageSlip;
@@ -245,106 +250,97 @@ pub async fn insert_rune_pool_intervals(
 ) -> Result<(), sqlx::Error> {
     for interval in intervals {
         let start_time: i64 = interval.startTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("startTime {} too large for i64", interval.startTime).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "startTime {} too large for i64",
+                interval.startTime
+            ))
         })?;
         let end_time: i64 = interval.endTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!("endTime {} too large for i64", interval.endTime).into())
+            sqlx::Error::Protocol(format!("endTime {} too large for i64", interval.endTime))
         })?;
         let to_asset_count: i64 = interval.toAssetCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("toAssetCount {} too large for i64", interval.toAssetCount).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "toAssetCount {} too large for i64",
+                interval.toAssetCount
+            ))
         })?;
         let to_rune_count: i64 = interval.toRuneCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("toRuneCount {} too large for i64", interval.toRuneCount).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "toRuneCount {} too large for i64",
+                interval.toRuneCount
+            ))
         })?;
         let to_trade_count: i64 = interval.toTradeCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("toTradeCount {} too large for i64", interval.toTradeCount).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "toTradeCount {} too large for i64",
+                interval.toTradeCount
+            ))
         })?;
         let from_trade_count: i64 = interval.fromTradeCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "fromTradeCount {} too large for i64",
-                    interval.fromTradeCount
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "fromTradeCount {} too large for i64",
+                interval.fromTradeCount
+            ))
         })?;
         let synth_mint_count: i64 = interval.synthMintCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "synthMintCount {} too large for i64",
-                    interval.synthMintCount
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "synthMintCount {} too large for i64",
+                interval.synthMintCount
+            ))
         })?;
         let synth_redeem_count: i64 = interval.synthRedeemCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "synthRedeemCount {} too large for i64",
-                    interval.synthRedeemCount
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "synthRedeemCount {} too large for i64",
+                interval.synthRedeemCount
+            ))
         })?;
         let total_count: i64 = interval.totalCount.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("totalCount {} too large for i64", interval.totalCount).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "totalCount {} too large for i64",
+                interval.totalCount
+            ))
         })?;
         let to_asset_volume: i64 = interval.toAssetVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("toAssetVolume {} too large for i64", interval.toAssetVolume).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "toAssetVolume {} too large for i64",
+                interval.toAssetVolume
+            ))
         })?;
         let to_rune_volume: i64 = interval.toRuneVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("toRuneVolume {} too large for i64", interval.toRuneVolume).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "toRuneVolume {} too large for i64",
+                interval.toRuneVolume
+            ))
         })?;
         let to_trade_volume: i64 = interval.toTradeVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("toTradeVolume {} too large for i64", interval.toTradeVolume).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "toTradeVolume {} too large for i64",
+                interval.toTradeVolume
+            ))
         })?;
         let from_trade_volume: i64 = interval.fromTradeVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "fromTradeVolume {} too large for i64",
-                    interval.fromTradeVolume
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "fromTradeVolume {} too large for i64",
+                interval.fromTradeVolume
+            ))
         })?;
         let synth_mint_volume: i64 = interval.synthMintVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "synthMintVolume {} too large for i64",
-                    interval.synthMintVolume
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "synthMintVolume {} too large for i64",
+                interval.synthMintVolume
+            ))
         })?;
         let synth_redeem_volume: i64 = interval.synthRedeemVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!(
-                    "synthRedeemVolume {} too large for i64",
-                    interval.synthRedeemVolume
-                )
-                .into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "synthRedeemVolume {} too large for i64",
+                interval.synthRedeemVolume
+            ))
         })?;
         let total_volume: i64 = interval.totalVolume.try_into().map_err(|_| {
-            sqlx::Error::Protocol(
-                format!("totalVolume {} too large for i64", interval.totalVolume).into(),
-            )
+            sqlx::Error::Protocol(format!(
+                "totalVolume {} too large for i64",
+                interval.totalVolume
+            ))
         })?;
 
         // Insert each interval data into the database
