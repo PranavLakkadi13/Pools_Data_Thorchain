@@ -342,6 +342,7 @@ pub async fn insert_rune_pool_intervals(
                 interval.totalVolume
             ))
         })?;
+        let rune_price_usd: f64 = interval.runePriceUSD;
 
         // Insert each interval data into the database
         sqlx::query(
@@ -376,7 +377,7 @@ pub async fn insert_rune_pool_intervals(
         .bind(interval.toAssetAverageSlip)
         .bind(interval.toRuneAverageSlip)
         .bind(interval.averageSlip)
-        .bind(interval.runePriceUSD)
+        .bind(rune_price_usd)
         .execute(pool)
         .await?;
 
