@@ -93,20 +93,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn runepool_fn() -> Result<reqwest::Response, reqwest::Error> {
-    reqwest::get("https://midgard.ninerealms.com/v2/history/runepool?interval=5min&count=10").await
+    reqwest::get("https://midgard.ninerealms.com/v2/history/runepool?interval=hour&count=10").await
 }
 
 async fn swap_history() -> Result<reqwest::Response, reqwest::Error> {
-    reqwest::get("https://midgard.ninerealms.com/v2/history/swaps?interval=5min&count=10").await
+    reqwest::get("https://midgard.ninerealms.com/v2/history/swaps?interval=hour&count=10").await
 }
 
 async fn earning_history() -> Result<reqwest::Response, reqwest::Error> {
-    reqwest::get("https://midgard.ninerealms.com/v2/history/earnings?interval=5min&count=10").await
+    reqwest::get("https://midgard.ninerealms.com/v2/history/earnings?interval=hour&count=10").await
 }
 
 async fn depth_data() -> Result<reqwest::Response, reqwest::Error> {
     reqwest::get(
-        "https://midgard.ninerealms.com/v2/history/depths/AVAX.AVAX/?interval=5min&count=10",
+        "https://midgard.ninerealms.com/v2/history/depths/AVAX.AVAX/?interval=hour&count=10",
     )
     .await
 }

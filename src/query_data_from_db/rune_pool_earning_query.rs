@@ -138,26 +138,36 @@ pub async fn fetch_intervals(
 ) -> Result<Json<Vec<EarningDataRunePoolInterval>>, (StatusCode, String)> {
     let rows = sqlx::query_as::<_, EarningDataRunePoolInterval>(
         r#"
-        WITH pool_data AS (
-            SELECT json_agg(
-                json_build_object(
-                    'id', p.id,
-                    'pool', p.pool,
-                    'asset_liquidity_fees', p.asset_liquidity_fees,
-                    'rune_liquidity_fees', p.rune_liquidity_fees,
-                    'total_liquidity_fees_rune', p.total_liquidity_fees_rune,
-                    'saver_earning', p.saver_earning,
-                    'rewards', p.rewards,
-                    'earnings', p.earnings
-                )
-            ) as pools_data
-            FROM earning_data_pool_data p
-        )
         SELECT 
-            i.*,
-            COALESCE(pd.pools_data, '[]'::json) as pools
+            i.id,
+            i.start_time,
+            i.end_time,
+            i.liquidity_fees,
+            i.block_rewards,
+            i.earnings,
+            i.bonding_earnings,
+            i.liquidity_earnings,
+            i.avg_node_count,
+            i.rune_price_usd,
+            COALESCE(
+                json_agg(
+                    json_build_object(
+                        'id', p.id,
+                        'pool', p.pool,
+                        'asset_liquidity_fees', p.asset_liquidity_fees,
+                        'rune_liquidity_fees', p.rune_liquidity_fees,
+                        'total_liquidity_fees_rune', p.total_liquidity_fees_rune,
+                        'saver_earning', p.saver_earning,
+                        'rewards', p.rewards,
+                        'earnings', p.earnings
+                    )
+                ) FILTER (WHERE p.id IS NOT NULL),
+                '[]'::json
+            ) as pools
         FROM earning_data_rune_pool_interval i
-        CROSS JOIN pool_data pd
+        LEFT JOIN earning_data_pool_data p ON i.id = p.interval_id
+        GROUP BY i.id
+        ORDER BY i.start_time DESC
         "#
     )
     .fetch_all(&pool)

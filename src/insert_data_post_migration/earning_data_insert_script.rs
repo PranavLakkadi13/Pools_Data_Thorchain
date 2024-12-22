@@ -3,6 +3,7 @@ use sqlx;
 
 pub async fn insert_pool_data(
     pool_data: &PoolData,
+    interval_id: i32,  // Add interval_id parameter
     pool: &sqlx::PgPool,
 ) -> Result<(), sqlx::Error> {
     // Helper function to convert f64 to i64 with range checking
@@ -17,40 +18,33 @@ pub async fn insert_pool_data(
         }
     }
 
-    // Use pool string directly
-    let pool_name = &pool_data.pool;
-
-    // Convert each field with the helper function
+    // Convert values
     let asset_liquidity_fees = f64_to_i64(pool_data.assetLiquidityFees, "assetLiquidityFees")?;
     let rune_liquidity_fees = f64_to_i64(pool_data.runeLiquidityFees, "runeLiquidityFees")?;
-    let total_liquidity_fees_rune =
-        f64_to_i64(pool_data.totalLiquidityFeesRune, "totalLiquidityFeesRune")?;
+    let total_liquidity_fees_rune = f64_to_i64(pool_data.totalLiquidityFeesRune, "totalLiquidityFeesRune")?;
     let saver_earning = f64_to_i64(pool_data.saverEarning, "saverEarning")?;
     let rewards = f64_to_i64(pool_data.rewards, "rewards")?;
     let earnings = f64_to_i64(pool_data.earnings, "earnings")?;
 
-    // Insert into the database
-    sqlx::query(
+    // Insert into the database with interval_id
+    sqlx::query!(
         r#"
-        INSERT INTO Earning_Data_Pool_Data (
-            pool, asset_liquidity_fees, rune_liquidity_fees, total_liquidity_fees_rune, 
-            saver_earning, rewards, earnings
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id
+        INSERT INTO earning_data_pool_data (
+            interval_id, pool, asset_liquidity_fees, rune_liquidity_fees,
+            total_liquidity_fees_rune, saver_earning, rewards, earnings
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         "#,
+        interval_id,
+        pool_data.pool,
+        asset_liquidity_fees,
+        rune_liquidity_fees,
+        total_liquidity_fees_rune,
+        saver_earning,
+        rewards,
+        earnings
     )
-    .bind(pool_name)
-    .bind(asset_liquidity_fees)
-    .bind(rune_liquidity_fees)
-    .bind(total_liquidity_fees_rune)
-    .bind(saver_earning)
-    .bind(rewards)
-    .bind(earnings)
-    .fetch_one(pool)
+    .execute(pool)
     .await?;
-
-    // Log insertion success
-    std::println!("The data has been inserted into earning_data_pool_data");
 
     Ok(())
 }
@@ -139,97 +133,37 @@ pub async fn insert_rune_pool_meta(
 }
 
 pub async fn insert_rune_pool_intervals(
-    intervals: &[RunePoolInterval], // Accepts a slice of RunePoolInterval
+    intervals: &[RunePoolInterval],
     pool: &sqlx::PgPool,
 ) -> Result<(), sqlx::Error> {
     for interval in intervals {
-        // Convert interval.startTime to i64 with error handling
-        let interval_start_time: i64 = interval.startTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!(
-                "startTime {} too large for i64",
-                interval.startTime
-            ))
-        })?;
-
-        // Convert interval.endTime to i64 with error handling
-        let interval_end_time: i64 = interval.endTime.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!("endTime {} too large for i64", interval.endTime))
-        })?;
-
-        // Convert interval.liquidityFees to i64 with error handling
-        let interval_liquidity_fees: i64 = interval.liquidityFees.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!(
-                "liquidityFees {} too large for i64",
-                interval.liquidityFees
-            ))
-        })?;
-
-        // Convert interval.blockRewards to i64 with error handling
-        let interval_block_rewards: i64 = interval.blockRewards.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!(
-                "blockRewards {} too large for i64",
-                interval.blockRewards
-            ))
-        })?;
-
-        // Convert interval.earnings to i64 with error handling
-        let interval_earnings: i64 = interval.earnings.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!("earnings {} too large for i64", interval.earnings))
-        })?;
-
-        // Convert interval.bondingEarnings to i64 with error handling
-        let interval_bonding_earnings: i64 = interval.bondingEarnings.try_into().map_err(|_| {
-            sqlx::Error::Protocol(format!(
-                "bondingEarnings {} too large for i64",
-                interval.bondingEarnings
-            ))
-        })?;
-
-        // Convert interval.liquidityEarnings to i64 with error handling
-        let interval_liquidity_earnings: i64 =
-            interval.liquidityEarnings.try_into().map_err(|_| {
-                sqlx::Error::Protocol(format!(
-                    "liquidityEarnings {} too large for i64",
-                    interval.liquidityEarnings
-                ))
-            })?;
-
-        // Use f64 directly for avgNodeCount and runePriceUSD as they do not need conversion
-        let avg_node_count = interval.avgNodeCount;
-        let rune_price_usd = interval.runePriceUSD;
-
-        if !interval.pools.is_empty() {
-            for pool_data in &interval.pools {
-                // Insert pool data
-                insert_pool_data(pool_data, pool).await?;
-            }
-        }
-
-        // Insert into the database
-        sqlx::query(
+        // First insert the interval and get its id
+        let interval_id = sqlx::query!(
             r#"
-            INSERT INTO Earning_Data_Rune_Pool_Interval (
-                start_time, end_time, liquidity_fees, block_rewards, earnings, bonding_earnings, 
-                liquidity_earnings, avg_node_count, rune_price_usd
+            INSERT INTO earning_data_rune_pool_interval (
+                start_time, end_time, liquidity_fees, block_rewards, earnings, 
+                bonding_earnings, liquidity_earnings, avg_node_count, rune_price_usd
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING id
             "#,
+            interval.startTime as i64,
+            interval.endTime as i64,
+            interval.liquidityFees as i64,
+            interval.blockRewards as i64,
+            interval.earnings as i64,
+            interval.bondingEarnings as i64,
+            interval.liquidityEarnings as i64,
+            interval.avgNodeCount,
+            interval.runePriceUSD
         )
-        .bind(interval_start_time)
-        .bind(interval_end_time)
-        .bind(interval_liquidity_fees)
-        .bind(interval_block_rewards)
-        .bind(interval_earnings)
-        .bind(interval_bonding_earnings)
-        .bind(interval_liquidity_earnings)
-        .bind(avg_node_count)
-        .bind(rune_price_usd)
         .fetch_one(pool)
-        .await?;
+        .await?
+        .id;
 
-        // Log insertion success
-        std::println!("The data has been inserted into earning_data_rune_pool_interval");
+        // Then insert all pool data for this interval
+        for pool_data in &interval.pools {
+            insert_pool_data(pool_data, interval_id, pool).await?;
+        }
     }
-
     Ok(())
 }
