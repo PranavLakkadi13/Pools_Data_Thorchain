@@ -1,4 +1,8 @@
-use axum::{Json, extract::State, http::StatusCode};
+use axum::{
+    extract::{Query, State},
+    Json,
+    http::StatusCode,
+};
 use serde::{Serialize, Deserialize};
 use sqlx::{FromRow, PgPool, Row, postgres::PgRow};
 
@@ -95,6 +99,12 @@ impl FromRow<'_, PgRow> for EarningDataRunePoolInterval {
     }
 }
 
+#[derive(Deserialize)]
+pub struct TimeFilter {
+    start_time: Option<i64>,
+    end_time: Option<i64>,
+}
+
 pub async fn fetch_pool_data(
     State(pool): State<PgPool>,
 ) -> Result<Json<Vec<EarningDataPoolData>>, (StatusCode, String)> {
@@ -116,28 +126,54 @@ pub async fn fetch_pool_data(
 
 pub async fn fetch_meta(
     State(pool): State<PgPool>,
+    Query(filter): Query<TimeFilter>,
 ) -> Result<Json<Vec<EarningDataRunePoolMeta>>, (StatusCode, String)> {
-    let rows = sqlx::query_as::<_, EarningDataRunePoolMeta>(
-        "SELECT * FROM earning_data_rune_pool_meta"
-    )
-    .fetch_all(&pool)
-    .await
-    .map_err(|e| {
-        eprintln!("Error fetching meta: {:?}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Database error: {}", e),
-        )
-    })?;
+    let query = match (filter.start_time, filter.end_time) {
+        (Some(start), Some(end)) => {
+            sqlx::query_as::<_, EarningDataRunePoolMeta>(
+                "SELECT * FROM earning_data_rune_pool_meta WHERE start_time >= $1 AND end_time <= $2"
+            )
+            .bind(start)
+            .bind(end)
+        },
+        (Some(start), None) => {
+            sqlx::query_as::<_, EarningDataRunePoolMeta>(
+                "SELECT * FROM earning_data_rune_pool_meta WHERE start_time >= $1"
+            )
+            .bind(start)
+        },
+        (None, Some(end)) => {
+            sqlx::query_as::<_, EarningDataRunePoolMeta>(
+                "SELECT * FROM earning_data_rune_pool_meta WHERE end_time <= $1"
+            )
+            .bind(end)
+        },
+        (None, None) => {
+            sqlx::query_as::<_, EarningDataRunePoolMeta>(
+                "SELECT * FROM earning_data_rune_pool_meta"
+            )
+        }
+    };
+
+    let rows = query
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            eprintln!("Error fetching meta: {:?}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Database error: {}", e),
+            )
+        })?;
 
     Ok(Json(rows))
 }
 
 pub async fn fetch_intervals(
     State(pool): State<PgPool>,
+    Query(filter): Query<TimeFilter>,
 ) -> Result<Json<Vec<EarningDataRunePoolInterval>>, (StatusCode, String)> {
-    let rows = sqlx::query_as::<_, EarningDataRunePoolInterval>(
-        r#"
+    let base_query = r#"
         SELECT 
             i.id,
             i.start_time,
@@ -166,19 +202,54 @@ pub async fn fetch_intervals(
             ) as pools
         FROM earning_data_rune_pool_interval i
         LEFT JOIN earning_data_pool_data p ON i.id = p.interval_id
-        GROUP BY i.id
-        ORDER BY i.start_time DESC
-        "#
-    )
-    .fetch_all(&pool)
-    .await
-    .map_err(|e| {
-        eprintln!("Error fetching intervals: {:?}", e);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Database error: {}", e),
-        )
-    })?;
+    "#;
+
+    let query = match (filter.start_time, filter.end_time) {
+        (Some(start), Some(end)) => {
+            format!(
+                "{} WHERE i.start_time >= $1 AND i.start_time <= $2 GROUP BY i.id ORDER BY i.start_time DESC",
+                base_query
+            )
+        },
+        (Some(start), None) => {
+            format!(
+                "{} WHERE i.start_time >= $1 GROUP BY i.id ORDER BY i.start_time DESC",
+                base_query
+            )
+        },
+        (None, Some(end)) => {
+            format!(
+                "{} WHERE i.start_time <= $1 GROUP BY i.id ORDER BY i.start_time DESC",
+                base_query
+            )
+        },
+        (None, None) => {
+            format!(
+                "{} GROUP BY i.id ORDER BY i.start_time DESC",
+                base_query
+            )
+        }
+    };
+
+    let query = sqlx::query_as::<_, EarningDataRunePoolInterval>(&query);
+
+    let query = match (filter.start_time, filter.end_time) {
+        (Some(start), Some(end)) => query.bind(start).bind(end),
+        (Some(start), None) => query.bind(start),
+        (None, Some(end)) => query.bind(end),
+        (None, None) => query,
+    };
+
+    let rows = query
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| {
+            eprintln!("Error fetching intervals: {:?}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Database error: {}", e),
+            )
+        })?;
 
     Ok(Json(rows))
 }

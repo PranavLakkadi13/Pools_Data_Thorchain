@@ -162,8 +162,9 @@ pub async fn start_server(pool: PgPool) -> Result<(), Box<dyn std::error::Error>
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
     println!("API Server running at http://{}", addr);
 
-    let listener = TcpListener::bind(&addr).await?;
-    axum::serve(listener, app.into_make_service()).await?;
+    // Updated server initialization
+    let listener = TcpListener::bind(addr).await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }
